@@ -1,3 +1,5 @@
+import numpy
+
 import window_setup
 
 import PIL
@@ -28,6 +30,11 @@ frame_count = 0
 global color_values
 color_values = []
 global image_grid
+
+global lastX
+lastX = 0
+global lastY
+lastY = 0
 
 
 global count
@@ -91,12 +98,19 @@ def load_image(pic_file):
 
 
 # Takes grid data, translates it into an image, and appends to list
-def make_image():
+def make_image(save=False):
     global images, image_grid, count
+    # dumb numpy linking to grid instead of just statically storing variable
+    tmp = numpy.copy(image_grid[lastY, lastX])
+    print(tmp)
+    image_grid[lastY, lastX] = hex_to_rgb("#ff0000")
     img = Image.fromarray(image_grid, 'RGB')
-    # img.save('my.gif')
+    image_grid[lastY, lastX] = tmp
+    print(tmp)
     images.append(img)
     count += 1
+    if save:
+        img.save("ant.png")
 
 
 # Makes and displays the gif from all of the images
@@ -124,9 +138,10 @@ def setup():
 
 # Updates the image grid with the new ant placements as well as spaces out when pictures should be made
 def update_image(x, y, color_index, step):
-    global max_steps, frame_count, image_grid, color_values, gif_frames
+    global max_steps, frame_count, image_grid, color_values, gif_frames, lastX, lastY
+    lastX = x
+    lastY = y
     image_grid[y, x] = hex_to_rgb(color_values[color_index])
-
     # Make a user defined length image gif either logarithmically or lineally
     if log_state:
         # New fancy logarithmic gif creation

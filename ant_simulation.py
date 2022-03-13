@@ -45,7 +45,7 @@ def run_simulation(ants, color_action, grid, max_steps):
                 ants[i][1] += 1
             elif ants[i][2] == 2:   # Down
                 ants[i][0] += 1
-            else:                       # Left
+            else:                   # Left
                 ants[i][1] -= 1
 
     # Run the simulation stopping if the ant hits the edge
@@ -54,5 +54,5 @@ def run_simulation(ants, color_action, grid, max_steps):
         if check_edge_collision():
             break
     window_setup.progress_update(max_steps)
-    image_processor.make_image()
+    image_processor.make_image(save=True)
     image_processor.make_gif()
