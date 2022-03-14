@@ -3,62 +3,54 @@ import logging as log
 import re
 from collections import defaultdict
 
-log.basicConfig(filename='Ant.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%H:%M:%S')
-
-"""
-COLORS
-Colors follow the following array pattern
+log.basicConfig(filename='Ant.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
+                datefmt='%H:%M:%S')
 
 
-"""
-
-UP_LEFT = 0
-UP_RIGHT = 1
-RIGHT = 2
-DOWN_RIGHT = 3
-DOWN_LEFT = 4
-LEFT = 5
-
-
-class HexGrid:
-    def __init__(self, height, width):
-        # Height and width 'must' both be odd, this just makes the grid look nice
-        self.height = (height + 1) if (height % 2 == 0) else height
-        self.width = (width + 1) if (width % 2 == 0) else width
-        # self.grid = np.zeros((height, width), dtype=np.uint)
-        self.starting_position = [int(height / 2), int(width / 2)]
-
-
+# direction - current direction the ant is facing
+# states - the given state diagram for our ants behavior
+# state - the current state our ant is in
 class Ant:
-    def __init__(self, init_x, init_y, direction, states=None, state=0):
+    def __init__(self, pos_x, pos_y, direction, states=None, state=0):
         if states is None:
             states = StateMachine(default=True)
-        self.x = init_x
-        self.y = init_y
         self.state_diagram = states
         self.state = state
         self.direction = direction
+        self.x = pos_x
+        self.y = pos_y
 
-    def move_ant(self):
-        transition = self.state_diagram.getTransition(self.state, )
+    def move_ant(self, color):
+        transition = self.state_diagram.get_transition(self.state, color)
+        # TODO - This will break when we go from like an 8 sided to a 4 sides polygon. Direction will need some
+        #  lookup table to translate these values
+        self.direction = (self.direction + transition.turn) % transition.sides
+        self.state = transition.next_state
+        return transition.next_color
 
 
-
+# turn - relative direction we should turn
+# next_color - color the space we are standing on should turn
+# next_state - the next state the ant will be in
+# sides - gives the number of available paths out of the current spot
 class StateTransition:
-    def __init__(self, turn, next_color, next_state):
+    def __init__(self, turn, next_color, next_state, sides=4):
         self.turn = turn
         self.next_color = next_color
         self.next_state = next_state
+        self.sides = sides
 
 
 class StateMachine:
     def __init__(self, default=False):
-        if default:
-            self.add_state_chunk(0, 0x000000, LEFT, 0xFFFFFF, 1)
-            self.add_state_chunk(0, 0xFFFFFF, RIGHT, 0x000000, 1)
         self.chunks = defaultdict(dict)
+        if default:
+            self.add_state_chunk(0, 0, 1, 3, 0)
+            self.add_state_chunk(0, 1, 1, 3, 1)
+            self.add_state_chunk(1, 0, 1, 1, 1)
+            self.add_state_chunk(1, 1, 0, 0, 0)
 
-    def add_state_chunk(self, state, color, turn, next_color, next_state):
+    def add_state_chunk(self, state, color, next_color, turn, next_state):
         if type(state) != int:
             log.error(f'State variable input into class State is not of type int it is {type(state)}')
         if type(color) != int:
@@ -72,19 +64,5 @@ class StateMachine:
         self.chunks[state][color] = StateTransition(turn, next_color, next_state)
 
     def get_transition(self, state, color):
-        return self.chunks[color][state]
-
-
-machine = State()
-machine.add_state_chunk(0, 0x000000, LEFT, 0xFFFFFF, 1)
-machine.add_state_chunk(0, 0xFFFFFF, RIGHT, 0x000000, 1)
-machine.add_state_chunk(1, 0x000000, LEFT, 0xFFFFFF, 2)
-machine.add_state_chunk(1, 0xFFFFFF, RIGHT, 0x000000, 2)
-machine.add_state_chunk(2, 0x000000, LEFT, 0xFFFFFF, 0)
-machine.add_state_chunk(2, 0xFFFFFF, RIGHT, 0x000000, 0)
-
-
-
-
-
+        return self.chunks[state][color]
 

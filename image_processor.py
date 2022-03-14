@@ -102,11 +102,9 @@ def make_image(save=False):
     global images, image_grid, count
     # dumb numpy linking to grid instead of just statically storing variable
     tmp = numpy.copy(image_grid[lastY, lastX])
-    print(tmp)
     image_grid[lastY, lastX] = hex_to_rgb("#ff0000")
     img = Image.fromarray(image_grid, 'RGB')
     image_grid[lastY, lastX] = tmp
-    print(tmp)
     images.append(img)
     count += 1
     if save:
