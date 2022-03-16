@@ -45,7 +45,7 @@ class StateMachine:
     def __init__(self, default=False):
         self.chunks = defaultdict(dict)
         if default:
-            self.add_state_chunk(0, 0, 1, 3, 0)
+            self.add_state_chunk(0, 0, 1, 3, 1)
             self.add_state_chunk(0, 1, 1, 3, 1)
             self.add_state_chunk(1, 0, 1, 1, 1)
             self.add_state_chunk(1, 1, 0, 0, 0)

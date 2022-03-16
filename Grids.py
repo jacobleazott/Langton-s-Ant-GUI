@@ -56,7 +56,7 @@ class SquareGrid:
 
         for x in range(0, self.size_x-1):
             for y in range(0, self.size_y-1):
-                if self.grid[x, y] == 0:
+                if self.grid[x, y] == 1:
                     image_grid[x, y] = (0, 0, 0)
                 else:
                     image_grid[x, y] = (255, 255, 255)
@@ -68,7 +68,7 @@ class SquareGrid:
 WIDTH = 500
 game = SquareGrid(500, 500)
 game.add_ant(250, 250, 2)
-game.fill_color(1)
-game.run_simulation(10000)
+game.fill_color(0)
+game.run_simulation(160000)
 game.make_image()
 
