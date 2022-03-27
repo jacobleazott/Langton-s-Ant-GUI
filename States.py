@@ -3,10 +3,6 @@ import logging as log
 import re
 from collections import defaultdict
 
-log.basicConfig(filename='Ant.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
-                datefmt='%H:%M:%S')
-
-
 # direction - current direction the ant is facing
 # states - the given state diagram for our ants behavior
 # state - the current state our ant is in
