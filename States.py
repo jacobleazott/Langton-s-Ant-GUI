@@ -3,8 +3,9 @@ import logging as log
 import re
 from collections import defaultdict
 
+
 # direction - current direction the ant is facing
-# states - the given state diagram for our ants behavior
+# states - the given state diagram for our ant's behavior
 # state - the current state our ant is in
 class Ant:
     def __init__(self, pos_x, pos_y, direction, states=None, state=0):
@@ -21,6 +22,7 @@ class Ant:
         # TODO - This will break when we go from like an 8 sided to a 4 sides polygon. Direction will need some
         #  lookup table to translate these values
         self.direction = (self.direction + transition.turn) % transition.sides
+        # print(self.direction, transition.turn, transition.sides)
         self.state = transition.next_state
         return transition.next_color
 
@@ -30,7 +32,7 @@ class Ant:
 # next_state - the next state the ant will be in
 # sides - gives the number of available paths out of the current spot
 class StateTransition:
-    def __init__(self, turn, next_color, next_state, sides=4):
+    def __init__(self, turn, next_color, next_state, sides):
         self.turn = turn
         self.next_color = next_color
         self.next_state = next_state
@@ -38,15 +40,10 @@ class StateTransition:
 
 
 class StateMachine:
-    def __init__(self, default=False):
+    def __init__(self):
         self.chunks = defaultdict(dict)
-        if default:
-            self.add_state_chunk(0, 0, 1, 3, 1)
-            self.add_state_chunk(0, 1, 1, 3, 1)
-            self.add_state_chunk(1, 0, 1, 1, 1)
-            self.add_state_chunk(1, 1, 0, 0, 0)
 
-    def add_state_chunk(self, state, color, next_color, turn, next_state):
+    def add_state_chunk(self, state=0, color=0, next_color=0, turn=0, next_state=0, sides=0):
         if type(state) != int:
             log.error(f'State variable input into class State is not of type int it is {type(state)}')
         if type(color) != int:
@@ -57,7 +54,7 @@ class StateMachine:
             log.error(f'Next_color variable input into class State is not of type int it is {type(next_color)}')
         if type(next_state) != int:
             log.error(f'Next_state variable input into class State is not of type int it is {type(next_state)}')
-        self.chunks[state][color] = StateTransition(turn, next_color, next_state)
+        self.chunks[state][color] = StateTransition(turn, next_color, next_state, sides=sides)
 
     def get_transition(self, state, color):
         return self.chunks[state][color]
